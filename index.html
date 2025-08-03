@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía completa de Jira para Educación</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 25px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+            padding: 70px 20px 50px;
+            position: relative;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            transform: rotate(30deg);
+            z-index: 0;
+        }
+
+        .header h1 {
+            font-size: 3.8rem;
+            margin-bottom: 15px;
+            text-shadow: 0 5px 25px rgba(0,0,0,0.4);
+            position: relative;
+            display: inline-block;
+            background: linear-gradient(90deg, #00c9ff, #92fe9d);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: float 6s ease-in-out infinite;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+
+        .menu-container {
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            position: relative;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            border-radius: 18px;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .menu-toggle::after {
+            content: "▼";
+            float: right;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .menu-toggle.active::after {
+            transform: rotate(180deg);
+        }
+
+        .tabs {
+            display: flex;
+            overflow-x: auto;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            padding: 8px;
+        }
+
+        .tabs.collapsed {
+            display: none;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: #a0a0c0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            white-space: nowrap;
+            min-width: 160px;
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            margin: 0 5px;
+        }
+        
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(106, 17, 203, 0.2), rgba(37, 117, 252, 0.2));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(37, 117, 252, 0.4);
+        }
+
+        .tab.active::before {
+            opacity: 1;
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.08);
+            color: #e0e0ff;
+        }
+
+        .content {
+            background: rgba(30, 30, 46, 0.7);
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+            min-height: 650px;
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 45px;
+            animation: fadeIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            0% { 
+                opacity: 0; 
+                transform: translateY(40px) scale(0.97); 
+            }
+            100% { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+            }
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .section {
+            margin-bottom: 45px;
+        }
+
+        .section h2 {
+            color: #6a11cb;
+            font-size: 2.4rem;
+            margin-bottom: 25px;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 15px;
+        }
+
+        .section h2::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 70px;
+            height: 4px;
+            background: linear-gradient(90deg, #6a11cb, #2575fc);
+            border-radius: 2px;
+        }
+
+        .section h3 {
+            color: #92fe9d;
+            font-size: 1.7rem;
+            margin: 30px 0 20px 0;
+            font-weight: 600;
+        }
+
+        .section p {
+            line-height: 1.9;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: #c0c0e0;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin: 35px 0;
+        }
+
+        .feature-card {
+            background: rgba(25, 25, 40, 0.7);
+            padding: 30px;
+            border-radius: 18px;
+            border: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #00c9ff, #92fe9d);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            border-color: rgba(106, 17, 203, 0.4);
+        }
+
+        .feature-card h4 {
+            color: #00c9ff;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .feature-card h4::before {
+            content: '✦';
+            margin-right: 12px;
+            font-size: 1.2rem;
+        }
+
+        .step-container {
+            background: rgba(25, 25, 40, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 25px 0;
+            border-left: 5px solid #00c9ff;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .step-container:hover {
+            transform: translateX(10px);
+        }
+
+        .step-number {
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 20px;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 10px rgba(37, 117, 252, 0.4);
+        }
+
+        .image-placeholder {
+            background: linear-gradient(135deg, rgba(0, 201, 255, 0.1), rgba(146, 254, 157, 0.1));
+            border: 2px dashed rgba(0, 201, 255, 0.5);
+            border-radius: 15px;
+            padding: 50px;
+            text-align: center;
+            margin: 25px 0;
+            color: #00c9ff;
+            font-style: italic;
+            transition: all 0.3s ease;
+        }
+
+        .image-placeholder:hover {
+            background: linear-gradient(135deg, rgba(0, 201, 255, 0.2), rgba(146, 254, 157, 0.2));
+            transform: scale(1.02);
+        }
+
+        .benefit-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefit-list li {
+            background: rgba(25, 25, 40, 0.7);
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #92fe9d;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+        }
+
+        .benefit-list li:hover {
+            transform: translateX(10px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            border-left: 4px solid #00c9ff;
+        }
+
+        .benefit-list li::before {
+            content: "✓";
+            color: #92fe9d;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 1.3rem;
+        }
+
+        .workflow-diagram {
+            background: rgba(25, 25, 40, 0.7);
+            border-radius: 15px;
+            padding: 35px;
+            margin: 30px 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .workflow-step {
+            display: inline-block;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: white;
+            padding: 18px 30px;
+            margin: 15px;
+            border-radius: 30px;
+            font-weight: 600;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(37, 117, 252, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .workflow-step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(37, 117, 252, 0.6);
+        }
+
+        .workflow-step::after {
+            content: "→";
+            position: absolute;
+            right: -30px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #00c9ff;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+
+        .workflow-step:last-child::after {
+            display: none;
+        }
+
+        .alert {
+            background: rgba(255, 193, 7, 0.15);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 5px solid #ffc107;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .alert-icon {
+            color: #ffc107;
+            margin-right: 15px;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.4rem;
+            }
+            
+            .header p {
+                font-size: 1.1rem;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(30, 30, 46, 0.95);
+                border-radius: 0 0 18px 18px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                z-index: 1000;
+                padding: 0;
+            }
+            
+            .tab {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                min-width: auto;
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .tab:last-child {
+                border-bottom: none;
+            }
+            
+            .tab-content {
+                padding: 25px;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section h2 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Guía completa de Jira para Educación</h1>
+            <p>Herramienta integral para la gestión de actividades docentes y coordinación académica</p>
+        </div>
+
+        <div class="menu-container">
+            <button class="menu-toggle" onclick="toggleMenu()">
+                📋 Menú de Navegación
+            </button>
+            <div class="tabs" id="tabsMenu">
+                <button class="tab active" onclick="showTab('intro')">¿Qué es Jira?</button>
+                <button class="tab" onclick="showTab('education')">Jira en Educación</button>
+                <button class="tab" onclick="showTab('benefits')">Beneficios</button>
+                <button class="tab" onclick="showTab('control')">Control Docente</button>
+                <button class="tab" onclick="showTab('economics')">Facultad</button>
+                <button class="tab" onclick="showTab('psychology')">Psicopedagogía</button>
+                <button class="tab" onclick="showTab('manual')">Manual de Uso</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Pestaña: ¿Qué es Jira? -->
+            <div id="intro" class="tab-content active">
+                <div class="section">
+                    <h2>¿Qué es Jira?</h2>
+                    <p>Jira es una potente herramienta de gestión de proyectos desarrollada por Atlassian, diseñada originalmente para el seguimiento de errores y gestión de proyectos de software, pero que ha evolucionado para convertirse en una solución integral para la gestión de cualquier tipo de proyecto, incluyendo el ámbito educativo.</p>
+                    
+                    <div class="image-placeholder">
+                        <img src="https://i.ibb.co/jpv0CYG/Captura-de-pantalla-2025-07-24-175218.png" alt="Captura-de-pantalla-2025-07-24-175218" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);"> 
+                    </div>
+
+                    <h3>Características Principales</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>🎯 Gestión de Tareas</h4>
+                            <p>Permite crear, asignar y hacer seguimiento de tareas de manera organizada y eficiente.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>📊 Tableros Kanban</h4>
+                            <p>Visualización clara del flujo de trabajo con columnas personalizables (Por hacer, En progreso, Completado).</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>📈 Reportes y Métricas</h4>
+                            <p>Generación automática de informes detallados sobre el progreso y rendimiento.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>👥 Colaboración</h4>
+                            <p>Herramientas integradas para comentarios, menciones y trabajo en equipo.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🔄 Flujos de Trabajo</h4>
+                            <p>Automatización de procesos mediante flujos de trabajo personalizables.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>📱 Acceso Multiplataforma</h4>
+                            <p>Disponible en web, móvil y aplicaciones de escritorio para acceso desde cualquier lugar.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert">
+                        <span class="alert-icon">💡</span>
+                        <strong>Dato Importante:</strong> Jira es utilizado por más de 180,000 organizaciones en todo el mundo, desde startups hasta grandes corporaciones y ahora, cada vez más instituciones educativas.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña: Jira en Educación -->
+            <div id="education" class="tab-content">
+                <div class="section">
+                    <h2>Jira en el ámbito educativo</h2>
+                    <p>La implementación de Jira en instituciones educativas representa una revolución en la gestión académica y administrativa. Esta herramienta permite a coordinadores, docentes y personal administrativo organizar, planificar y ejecutar actividades educativas de manera más eficiente.</p>
+
+                    <div class="image-placeholder">
+                         <img src="https://i.ibb.co/3ntS9sS/Captura-de-pantalla-2025-07-24-183724.png" alt="Captura-de-pantalla-2025-07-24-183724" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">  
+                    </div>
+
+                    <h3>Aplicaciones en Educación</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>📚 Gestión Curricular</h4>
+                            <p>Planificación y seguimiento de programas académicos, actualización de contenidos y coordinación entre materias.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>👨‍🏫 Coordinación Docente</h4>
+                            <p>Asignación de tareas a profesores, seguimiento de actividades pedagógicas y evaluación del desempeño.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>📋 Proyectos Estudiantiles</h4>
+                            <p>Supervisión de tesis, trabajos de investigación y proyectos de fin de carrera.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🏛️ Gestión Administrativa</h4>
+                            <p>Organización de eventos académicos, procesos de acreditación y gestión de recursos.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>📊 Evaluación Institucional</h4>
+                            <p>Seguimiento de indicadores de calidad, autoevaluación y mejora continua.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🤝 Colaboración Interdisciplinaria</h4>
+                            <p>Coordinación entre diferentes facultades y departamentos para proyectos transversales.</p>
+                        </div>
+                    </div>
+
+                    <h3>Casos de Uso Específicos</h3>
+                    <div class="workflow-diagram">
+                        <div class="workflow-step">Planificación Semestral</div>
+                        <div class="workflow-step">Asignación de Recursos</div>
+                        <div class="workflow-step">Ejecución de Actividades</div>
+                        <div class="workflow-step">Seguimiento y Control</div>
+                        <div class="workflow-step">Evaluación de Resultados</div>
+                    </div>
+
+                    <div class="image-placeholder">
+                        <img src="https://i.ibb.co/LdRLmDX7/Captura-de-pantalla-2025-07-24-233435.png" alt="Captura-de-pantalla-2025-07-24-233435" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">  
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña: Beneficios -->
+            <div id="benefits" class="tab-content">
+                <div class="section">
+                    <h2>Beneficios de implementar Jira en educación</h2>
+                    
+                    <h3>🎯 Beneficios Operativos</h3>
+                    <ul class="benefit-list">
+                        <li><strong>Centralización de Información:</strong> Toda la información académica y administrativa en un solo lugar accesible.</li>
+                        <li><strong>Mejora en la Comunicación:</strong> Canales claros de comunicación entre coordinadores, docentes y personal administrativo.</li>
+                        <li><strong>Transparencia en Procesos:</strong> Visibilidad completa del estado de proyectos y actividades académicas.</li>
+                        <li><strong>Reducción de Reuniones:</strong> Menos necesidad de reuniones presenciales gracias a la comunicación asíncrona.</li>
+                        <li><strong>Automatización de Tareas:</strong> Reducción del trabajo manual mediante flujos automatizados.</li>
+                    </ul>
+
+                    <div class="image-placeholder">
+                        <img src="https://i.ibb.co/tpg8t2HC/Captura-de-pantalla-2025-07-24-200644.png" alt="Captura-de-pantalla-2025-07-24-200644" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);"> 
+                    </div>
+
+                    <h3>📈 Beneficios Estratégicos</h3>
+                    <ul class="benefit-list">
+                        <li><strong>Toma de Decisiones Basada en Datos:</strong> Reportes detallados para decisiones informadas.</li>
+                        <li><strong>Mejora Continua:</strong> Identificación de áreas de mejora mediante análisis de métricas.</li>
+                        <li><strong>Escalabilidad:</strong> Capacidad de crecer y adaptarse a las necesidades cambiantes de la institución.</li>
+                        <li><strong>Cumplimiento de Estándares:</strong> Facilita el cumplimiento de requisitos de acreditación y calidad.</li>
+                        <li><strong>Innovación Pedagógica:</strong> Fomenta la adopción de nuevas metodologías de enseñanza.</li>
+                    </ul>
+
+                    <h3>💰 Beneficios Económicos</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>💵 Reducción de Costos</h4>
+                            <p>Disminución en costos operativos por mayor eficiencia en procesos administrativos.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>⏱️ Ahorro de Tiempo</h4>
+                            <p>Hasta 30% de reducción en tiempo dedicado a tareas administrativas repetitivas.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>📋 Menos Papelería</h4>
+                            <p>Digitalización de procesos reduce significativamente el uso de papel y archivos físicos.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🎯 Mayor Productividad</h4>
+                            <p>Incremento en la productividad del personal académico y administrativo.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert">
+                        <span class="alert-icon">📊</span>
+                        <strong>Estadística:</strong> Las instituciones que implementan Jira reportan un 40% de mejora en la eficiencia de gestión de proyectos académicos.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña: Control Docente -->
+            <div id="control" class="tab-content">
+                <div class="section">
+                    <h2>Control de actividades docentes con Jira</h2>
+                    <p>Jira ofrece un sistema integral para el control y seguimiento de todas las actividades docentes, desde la planificación hasta la evaluación de resultados.</p>
+
+                    <h3>🎯 Áreas de Control</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>📅 Planificación Académica</h4>
+                            <p>Control de cronogramas, asignación de materias y coordinación de horarios.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>📚 Desarrollo Curricular</h4>
+                            <p>Seguimiento de la implementación de programas de estudio y actualización de contenidos.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>👥 Gestión de Personal</h4>
+                            <p>Asignación de tareas, evaluación de desempeño y desarrollo profesional docente.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>📊 Evaluación y Seguimiento</h4>
+                            <p>Monitoreo de indicadores de calidad y resultados académicos.</p>
+                        </div>
+                    </div>
+
+                    <div class="image-placeholder">
+                         <img src="https://i.ibb.co/Y4hWw7gV/Captura-de-pantalla-2025-07-24-202350.png" alt="Captura-de-pantalla-2025-07-24-202350" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">  
+                    </div>
+
+                    <h3>🔄 Flujo de Trabajo Docente</h3>
+                    <div class="step-container">
+                        <span class="step-number">1</span>
+                        <strong>Planificación:</strong> Creación de épicas para cada semestre académico con todas las actividades programadas.
+                    </div>
+                    <div class="step-container">
+                        <span class="step-number">2</span>
+                        <strong>Asignación:</strong> Distribución de tareas específicas a cada docente con fechas límite y recursos necesarios.
+                    </div>
+                    <div class="step-container">
+                        <span class="step-number">3</span>
+                        <strong>Ejecución:</strong> Los docentes actualizan el progreso de sus actividades en tiempo real.
+                    </div>
+                    <div class="step-container">
+                        <span class="step-number">4</span>
+                        <strong>Seguimiento:</strong> Los coordinadores monitorean el avance y brindan apoyo cuando es necesario.
+                    </div>
+                    <div class="step-container">
+                        <span class="step-number">5</span>
+                        <strong>Evaluación:</strong> Análisis de resultados y generación de reportes para la toma de decisiones.
+                    </div>
+
+                    <h3>📋 Tipos de Actividades Controladas</h3>
+                    <ul class="benefit-list">
+                        <li>Preparación de clases y material didáctico</li>
+                        <li>Evaluaciones y calificaciones</li>
+                        <li>Tutorías y asesorías académicas</li>
+                        <li>Investigación y publicaciones</li>
+                        <li>Participación en eventos académicos</li>
+                        <li>Capacitación y desarrollo profesional</li>
+                        <li>Actividades de extensión universitaria</li>
+                        <li>Proyectos de mejora institucional</li>
+                    </ul>
+
+                    <div class="image-placeholder">
+                        <img src="https://i.ibb.co/tMVVwc8C/Captura-de-pantalla-2025-07-24-203806.png" alt="Captura-de-pantalla-2025-07-24-203806" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">  
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- Pestaña: Ciencias Económicas -->
+            <div id="economics" class="tab-content">
+                <div class="section">
+                    <h2>Manual para Coordinación de Facultad de Ciencias Económicas</h2>
+                    <p>Guía específica para implementar Jira en la coordinación de la Facultad de Ciencias Económicas, adaptada a las necesidades particulares de esta área académica.</p>
+
+                    <div class="image-placeholder">
+                        <img src="https://i.ibb.co/8nt3MNKV/Captura-de-pantalla-2025-07-24-204706.png" alt="Captura-de-pantalla-2025-07-24-204706" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    </div>
+
+                    <h3>🎯 Configuración Inicial</h3>
+                    <div class="step-container">
+                        <span class="step-number">1</span>
+                        <strong>Crear Proyecto Principal:</strong> "Facultad de Ciencias Económicas - 2025"
+                        <div class="image-placeholder">
+                            <img src="https://i.ibb.co/9HnRrYF4/Captura-de-pantalla-2025-07-24-205132.png" alt="Captura-de-pantalla-2025-07-24-205132" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <span class="step-number">2</span>
+                        <strong>Configurar Componentes:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Administración de Empresas</li>
+                            <li>Contabilidad y Finanzas</li>
+                            <li>Economía</li>
+                            <li>Marketing</li>
+                            <li>Recursos Humanos</li>
+                            <li>Investigación</li>
+                            <li>Extensión</li>
+                        </ul>
+                    </div>
+
+                    <div class="step-container">
+                        <span class="step-number">3</span>
+                        <strong>Definir Tipos de Issues:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>📚 Planificación Curricular</li>
+                            <li>👨‍🏫 Actividad Docente</li>
+                            <li>🔬 Proyecto de Investigación</li>
+                            <li>📊 Evaluación Académica</li>
+                            <li>🎓 Trabajo de Grado</li>
+                            <li>🏢 Práctica Profesional</li>
+                            <li>📈 Evento Académico</li>
+                        </ul>
+                    </div>
+
+                    <h3>📊 Casos de Uso Específicos</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>💼 Gestión de Prácticas Empresariales</h4>
+                            <p>Control de convenios con empresas, asignación de estudiantes y seguimiento de prácticas profesionales.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>📈 Proyectos de Investigación Económica</h4>
+                            <p>Seguimiento de investigaciones en áreas como macroeconomía, microeconomía y economía aplicada.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🎯 Simulaciones Empresariales</h4>
+                            <p>Organización de competencias y simulaciones de negocios para estudiantes.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>📊 Análisis de Mercado</h4>
+                            <p>Coordinación de estudios de mercado y proyectos de consultoría estudiantil.</p>
+                        </div>
+                    </div>
+
+                    <div class="image-placeholder">
+                         <img src="https://i.ibb.co/nM2mR2BY/Captura-de-pantalla-2025-07-24-211111.png" alt="Captura-de-pantalla-2025-07-24-211111" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    </div>
+
+                    <h3>🔧 Flujos de trabajo personalizados</h3>
+                    <div class="workflow-diagram">
+                        <div class="workflow-step">Propuesta</div>
+                        <div class="workflow-step">Revisión Académica</div>
+                        <div class="workflow-step">Aprobación</div>
+                        <div class="workflow-step">En Desarrollo</div>
+                        <div class="workflow-step">Evaluación</div>
+                        <div class="workflow-step">Completado</div>
+                    </div>
+
+                    <div class="alert">
+                        <span class="alert-icon">💡</span>
+                        <strong>Tip Específico:</strong> Configure campos personalizados para tracking de indicadores económicos relevantes en proyectos de investigación.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña: Psicopedagogía -->
+            <div id="psychology" class="tab-content">
+                <div class="section">
+                    <h2>Manual para Coordinación de Unidad Psicopedagogica</h2>
+                    <p>Implementación especializada de Jira para la Unidad de Psicopedagogía, enfocada en el apoyo académico y desarrollo estudiantil.</p>
+
+                    <div class="image-placeholder">
+                        <img src="https://i.ibb.co/HTG46YDk/Captura-de-pantalla-2025-07-24-212411.png" alt="Captura-de-pantalla-2025-07-24-212411" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    </div>
+
+                    <h3>🎯 Configuración Especializada</h3>
+                    <div class="step-container">
+                        <span class="step-number">1</span>
+                        <strong>Crear Proyecto:</strong> "Unidad de Psicopedagogía - Apoyo Académico Ciclo 02-2025"
+                        <div class="image-placeholder">
+                            <img src="https://i.ibb.co/bgP6smdZ/Captura-de-pantalla-2025-07-24-212851.png" alt="Captura-de-pantalla-2025-07-24-212851" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <span class="step-number">2</span>
+                        <strong>Componentes Específicos:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>Orientación Vocacional</li>
+                            <li>Apoyo Académico</li>
+                            <li>Bienestar Estudiantil</li>
+                            <li>Inclusión Educativa</li>
+                            <li>Desarrollo de Habilidades</li>
+                            <li>Seguimiento Psicopedagógico</li>
+                        </ul>
+                    </div>
+
+                    <div class="step-container">
+                        <span class="step-number">3</span>
+                        <strong>Tipos de Casos:</strong>
+                        <ul style="margin-top: 10px; margin-left: 20px;">
+                            <li>🎯 Consulta Individual</li>
+                            <li>👥 Taller Grupal</li>
+                            <li>📊 Evaluación Psicopedagógica</li>
+                            <li>🔄 Seguimiento Académico</li>
+                            <li>🎓 Orientación Vocacional</li>
+                            <li>🤝 Apoyo a Docentes</li>
+                            <li>📈 Programa de Mejora</li>
+                        </ul>
+                    </div>
+
+                    <h3>🔍 Áreas de Intervención</h3>
+                    <div class="feature-grid">
+                        <div class="feature-card">
+                            <h4>📚 Dificultades de Aprendizaje</h4>
+                            <p>Identificación, evaluación y seguimiento de estudiantes con necesidades educativas especiales.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🎯 Orientación Vocacional</h4>
+                            <p>Procesos de orientación para elección de carrera y desarrollo profesional.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>💪 Desarrollo de Habilidades</h4>
+                            <p>Programas para fortalecer habilidades de estudio, comunicación y liderazgo.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🤝 Apoyo Emocional</h4>
+                            <p>Intervenciones para manejo de estrés, ansiedad y adaptación universitaria.</p>
+                        </div>
+                    </div>
+
+                    <div class="image-placeholder">
+                        <img src="https://i.ibb.co/cXk6bGCh/Captura-de-pantalla-2025-07-24-213237.png" alt="Captura-de-pantalla-2025-07-24-213237" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                    </div>
+
+                    <h3>📋 Proceso de Atención</h3>
+                    <div class="workflow-diagram">
+                        <div class="workflow-step">Solicitud</div>
+                        <div class="workflow-step">Evaluación Inicial</div>
+                        <div class="workflow-step">Plan de Intervención</div>
+                        <div class="workflow-step">Implementación</div>
+                        <div class="workflow-step">Seguimiento</div>
+                        <div class="workflow-step">Cierre</div>
+                    </div>
+
+                    <h3>📊 Métricas y Seguimiento</h3>
+                    <ul class="benefit-list">
+                        <li>Número de estudiantes atendidos por período</li>
+                        <li>Tipos de consultas más frecuentes</li>
+                        <li>Tiempo promedio de resolución de casos</li>
+                        <li>Efectividad de intervenciones</li>
+                        <li>Satisfacción de usuarios</li>
+                        <li>Derivaciones a servicios especializados</li>
+                    </ul>
+
+                    <div class="alert">
+                        <span class="alert-icon">🔒</span>
+                        <strong>Confidencialidad:</strong> Configure permisos estrictos para proteger la información sensible de los estudiantes atendidos.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña: Manual de Uso -->
+            <div id="manual" class="tab-content">
+                <div class="section">
+                    <h2>Manual de uso de Jira</h2>
+                    <p>Guía completa para comenzar a usar Jira desde cero, con instrucciones detalladas para coordinadores académicos.</p>
+
+                    <h3>🚀 Primeros Pasos</h3>
+                    <div class="step-container">
+                        <span class="step-number">1</span>
+                        <strong>Registro y Acceso</strong>
+                        <p>Visite <a href="https://www.atlassian.com/software/jira" target="_blank">atlassian.com/software/jira</a> y cree una cuenta institucional.</p>
+                        <div class="image-placeholder">
+                            <img src="https://i.ibb.co/HTh7wGKn/Captura-de-pantalla-2025-07-24-222537.png" alt="Captura-de-pantalla-2025-07-24-222537" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <span class="step-number">2</span>
+                        <strong>Configuración Inicial</strong>
+                        <p>Seleccione el template "Project Management" y personalice según sus necesidades académicas.</p>
+                        <div class="image-placeholder">
+                             <img src="https://i.ibb.co/HpRkJDHd/Captura-de-pantalla-2025-07-24-214414.png" alt="Captura-de-pantalla-2025-07-24-214414" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <span class="step-number">3</span>
+                        <strong>Creación del Primer Proyecto</strong>
+                        <p>Configure su proyecto con nombre, clave y descripción apropiados para su facultad.</p>
+                        <div class="image-placeholder">
+                            <img src="https://i.ibb.co/cKGDt9kQ/Captura-de-pantalla-2025-07-24-220211.png" alt="Captura-de-pantalla-2025-07-24-220211" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+
+                    <h3>👥 Gestión de Usuarios</h3>
+                    <div class="step-container">
+                        <span class="step-number">4</span>
+                        <strong>Invitar Colaboradores</strong>
+                        <p>Agregue docentes y personal administrativo con roles específicos (Admin, Coordinador, Docente).</p>
+                        <div class="image-placeholder">
+                            <img src="https://i.ibb.co/YT77yxLX/Captura-de-pantalla-2025-07-24-220537.png" alt="Captura-de-pantalla-2025-07-24-220537" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <span class="step-number">5</span>
+                        <strong>Configurar Permisos</strong>
+                        <p>Establezca qué puede hacer cada tipo de usuario en el sistema.</p>
+                        <div class="image-placeholder">
+                            <img src="https://i.ibb.co/4wRN0rcw/Captura-de-pantalla-2025-07-24-221806.png" alt="Captura-de-pantalla-2025-07-24-221806" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+
+                    <h3>📋 Creación y Gestión de Tareas</h3>
+                    <div class="step-container">
+                        <span class="step-number">6</span>
+                        <strong>Crear Issues</strong>
+                        <p>Aprenda a crear diferentes tipos de tareas: Épicas, Historias, Tareas y Subtareas.</p>
+                        <div class="image-placeholder">
+                             <img src="https://i.ibb.co/V8xJJYC/Captura-de-pantalla-2025-07-24-221907.png" alt="Captura-de-pantalla-2025-07-24-221907" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <span class="step-number">7</span>
+                        <strong>Asignar y Priorizar</strong>
+                        <p>Asigne tareas a responsables, establezca fechas límite y niveles de prioridad.</p>
+                        <div class="image-placeholder">
+                             <img src="https://i.ibb.co/8L1FkxF4/Captura-de-pantalla-2025-07-24-230250.png" alt="Captura-de-pantalla-2025-07-24-230250" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+
+                    <h3>📊 Seguimiento y Reportes</h3>
+                    <div class="step-container">
+                        <span class="step-number">8</span>
+                        <strong>Usar Tableros</strong>
+                        <p>Navegue por los tableros Kanban y Scrum para visualizar el progreso.</p>
+                        <div class="image-placeholder">
+                            <img src="https://i.ibb.co/ycWYqFxR/Captura-de-pantalla-2025-07-24-231810.png" alt="Captura-de-pantalla-2025-07-24-231810" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+
+                    <div class="step-container">
+                        <span class="step-number">9</span>
+                        <strong>Generar Reportes</strong>
+                        <p>Cree reportes automáticos de productividad, tiempo y cumplimiento.</p>
+                        <div class="image-placeholder">
+                            <img src="https://i.ibb.co/qYmSDhsk/Captura-de-pantalla-2025-07-24-231947.png" alt="Captura-de-pantalla-2025-07-24-231947" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+
+                    <h3>🔧 Personalización Avanzada</h3>
+                    <div class="step-container">
+                        <span class="step-number">10</span>
+                        <strong>Campos Personalizados</strong>
+                        <p>Agregue campos específicos para su institución (código de materia, semestre, etc.).</p>
+                        <div class="image-placeholder">
+                            <img src="https://i.ibb.co/xS1b1BLq/Captura-de-pantalla-2025-07-24-232402.png" alt="Captura-de-pantalla-2025-07-24-232402" border="0" style="width: 100%; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                        </div>
+                    </div>
+
+                    <div class="alert">
+                        <span class="alert-icon">🎓</span>
+                        <strong>Capacitación:</strong> Atlassian ofrece certificaciones gratuitas para administradores de Jira. Recomendamos completar el curso básico antes de la implementación.
+                    </div>
+
+                    <h3>📞 Soporte y Recursos</h3>
+                    <ul class="benefit-list">
+                        <li>Documentación oficial: <a href="https://support.atlassian.com/jira/" target="_blank">support.atlassian.com/jira/</a></li>
+                        <li>Comunidad de usuarios: <a href="https://community.atlassian.com/" target="_blank">community.atlassian.com</a></li>
+                        <li>Cursos gratuitos: <a href="https://university.atlassian.com/" target="_blank">university.atlassian.com</a></li>
+                        <li>Soporte técnico 24/7 para cuentas premium</li>
+                        <li>Webinars semanales sobre mejores prácticas</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleMenu() {
+            const tabsMenu = document.getElementById('tabsMenu');
+            const menuToggle = document.querySelector('.menu-toggle');
+            
+            tabsMenu.classList.toggle('collapsed');
+            menuToggle.classList.toggle('active');
+        }
+
+        function showTab(tabName) {
+            // Ocultar todos los contenidos
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remover clase active de todas las pestañas
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Mostrar el contenido seleccionado
+            document.getElementById(tabName).classList.add('active');
+
+            // Activar la pestaña seleccionada
+            event.target.classList.add('active');
+
+            // En móvil, cerrar el menú después de seleccionar
+            if (window.innerWidth <= 768) {
+                const tabsMenu = document.getElementById('tabsMenu');
+                const menuToggle = document.querySelector('.menu-toggle');
+                tabsMenu.classList.add('collapsed');
+                menuToggle.classList.remove('active');
+            }
+        }
+
+        // Animación de entrada
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.feature-card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+            });
+        });
+
+        // Efecto hover en las tarjetas
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-5px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9645c9e6d648f50c',t:'MTc1MzM4NDk3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
